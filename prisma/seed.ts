@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 import { customers } from './seeds/customers';
 
@@ -9,7 +10,10 @@ async function main() {
     await prisma.customer.upsert({
       where: { id: customer.id },
       update: {},
-      create: customer,
+      create: {
+        ...customer,
+        password: await bcrypt.hash(customer.password, 10),
+      },
     });
   }
   console.log(`Created ${customers.length} customers`);

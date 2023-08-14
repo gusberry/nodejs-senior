@@ -10,7 +10,8 @@ type Customer {
 
   """Date and time when the object was updated last time."""
   updatedAt: Timestamp!
-  email: String!
+  email: Email!
+  role: Role!
 }
 
 """
@@ -18,8 +19,54 @@ type Customer {
 """
 scalar Timestamp
 
+"""A field representing email address"""
+scalar Email
+
+enum Role {
+  USER
+  ADMIN
+}
+
+type SignInUserEntity {
+  id: String!
+
+  """Date and time when object was created."""
+  createdAt: Timestamp!
+
+  """Date and time when the object was updated last time."""
+  updatedAt: Timestamp!
+  email: Email!
+}
+
+type SignInEntity {
+  id: ID!
+
+  """Date and time when object was created."""
+  createdAt: Timestamp!
+
+  """Date and time when the object was updated last time."""
+  updatedAt: Timestamp!
+  access_token: String!
+  refresh_token: String!
+  user: SignInUserEntity!
+}
+
+type RefreshEntity {
+  id: ID!
+
+  """Date and time when object was created."""
+  createdAt: Timestamp!
+
+  """Date and time when the object was updated last time."""
+  updatedAt: Timestamp!
+  access_token: String!
+  refresh_token: String!
+  user: SignInUserEntity!
+}
+
 type Query {
   customers(data: GetCustomerInput!): [Customer!]!
+  customer(data: GetSingleCustomerInput!): Customer!
 }
 
 input GetCustomerInput {
@@ -31,7 +78,54 @@ input GetCustomerInput {
 
 input WhereCustomerInput {
   id: String
-  email: String
+  email: Email
   createdAt: Timestamp
   updatedAt: Timestamp
+}
+
+input GetSingleCustomerInput {
+  where: WhereSingleCustomerInput!
+}
+
+input WhereSingleCustomerInput {
+  id: String
+  email: Email
+}
+
+type Mutation {
+  deleteCustomer(data: GetSingleCustomerInput!): Customer!
+  updateCustomer(data: UpdateSingleCustomerInput!): Customer!
+  signIn(data: SingInInput!): SignInEntity!
+  signUp(data: SingUpInput!): Customer!
+  verify(data: VerifyCodeInput!): Customer!
+  refresh(data: RefreshTokenInput!): RefreshEntity!
+}
+
+input UpdateSingleCustomerInput {
+  where: WhereSingleCustomerInput!
+  data: UpdateCustomerInput!
+}
+
+input UpdateCustomerInput {
+  email: Email!
+  refreshToken: String
+  isVerified: Boolean
+}
+
+input SingInInput {
+  email: Email!
+  password: String!
+}
+
+input SingUpInput {
+  email: Email!
+  password: String!
+}
+
+input VerifyCodeInput {
+  code: String!
+}
+
+input RefreshTokenInput {
+  refresh_token: String!
 }
